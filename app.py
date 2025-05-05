@@ -407,6 +407,26 @@ def test_reminder():
 
     return redirect(url_for('reminder_settings'))
 
+@app.route('/voice_analysis', methods=['POST'])
+def analyze_voice():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    try:
+        from voice_analysis import VoiceAnalyzer
+        analyzer = VoiceAnalyzer()
+        
+        # Nagrywanie i analiza
+        audio_data = analyzer.record_audio()
+        if audio_data is None:
+            return jsonify({'error': 'Failed to record audio'}), 500
+            
+        analysis = analyzer.analyze_emotion(audio_data)
+        return jsonify(analysis)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
