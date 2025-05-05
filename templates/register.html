@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="auth-card card shadow">
+    <div class="card-body p-4">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-user-plus text-info me-2"></i>Rejestracja
+        </h2>
+        
+        <form action="{{ url_for('register') }}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Nazwa użytkownika</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="form-text">Wybierz unikalną nazwę użytkownika.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="password" class="form-label">Hasło</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                </div>
+                <div class="form-text">Hasło powinno zawierać minimum 6 znaków.</div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-info btn-therapy">
+                    <i class="fas fa-user-plus me-2"></i>Zarejestruj się
+                </button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-4">
+            <p>Masz już konto? <a href="{{ url_for('login') }}" class="text-info">Zaloguj się</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4 bg-dark">
+    <div class="card-body p-4">
+        <h5 class="card-title text-info mb-3">
+            <i class="fas fa-info-circle me-2"></i>Co oferujemy?
+        </h5>
+        <ul class="list-group list-group-flush bg-dark">
+            <li class="list-group-item bg-dark">
+                <i class="fas fa-check-circle text-info me-2"></i>
+                Codzienne pytania refleksyjne dostosowane do Twoich potrzeb
+            </li>
+            <li class="list-group-item bg-dark">
+                <i class="fas fa-check-circle text-info me-2"></i>
+                Przestrzeń do zapisywania i śledzenia swoich przemyśleń
+            </li>
+            <li class="list-group-item bg-dark">
+                <i class="fas fa-check-circle text-info me-2"></i>
+                Wsparcie w lepszym zrozumieniu swoich emocji i zachowań
+            </li>
+            <li class="list-group-item bg-dark">
+                <i class="fas fa-check-circle text-info me-2"></i>
+                Pełną prywatność i bezpieczeństwo Twoich danych
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

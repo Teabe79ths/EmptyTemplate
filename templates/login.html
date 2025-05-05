@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="auth-card card shadow">
+    <div class="card-body p-4">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-sign-in-alt text-info me-2"></i>Logowanie
+        </h2>
+        
+        <form action="{{ url_for('login') }}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Nazwa użytkownika</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="password" class="form-label">Hasło</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-info btn-therapy">
+                    <i class="fas fa-sign-in-alt me-2"></i>Zaloguj się
+                </button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-4">
+            <p>Nie masz jeszcze konta? <a href="{{ url_for('register') }}" class="text-info">Zarejestruj się</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <div class="quote-container">
+        <blockquote class="blockquote">
+            <p>"Poznaj siebie, aby poznać swoje możliwości."</p>
+        </blockquote>
+        <figcaption class="blockquote-footer">
+            Sokrates
+        </figcaption>
+    </div>
+</div>
+{% endblock %}

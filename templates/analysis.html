@@ -1,0 +1,435 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="therapy-container">
+    <h2 class="mb-4">
+        <i class="fas fa-brain text-info me-2"></i>Twoja analiza psychologiczna
+    </h2>
+
+    {% if analysis %}
+        <p class="lead mb-4">
+            Oto analiza Twoich odpowiedzi oparta na technikach uczenia maszynowego. 
+            Pamiętaj, że to tylko narzędzie pomocnicze - prawdziwy rozwój osobisty 
+            wymaga refleksji i działania.
+        </p>
+
+        <!-- Score Card -->
+        <div class="card score-card bg-dark mb-4">
+            <div class="card-body text-center p-4">
+                <h4 class="mb-3">Twój wskaźnik rozwoju emocjonalnego</h4>
+                <div class="progress-container mb-4">
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-info" role="progressbar" 
+                            style="width: {{ analysis.emotional_intelligence_score }}%;" 
+                            aria-valuenow="{{ analysis.emotional_intelligence_score }}" 
+                            aria-valuemin="0" aria-valuemax="100">
+                            {{ analysis.emotional_intelligence_score }}/100
+                        </div>
+                    </div>
+                    <div class="progress-labels mt-2">
+                        <span class="text-muted">Początkujący</span>
+                        <span class="text-info">Rozwijający się</span>
+                        <span class="text-success">Zaawansowany</span>
+                    </div>
+                </div>
+
+                <div class="score-details">
+                    <div class="score-aspect mb-3">
+                        <h6 class="text-info">Samoświadomość <small class="text-muted">(zdolność rozpoznawania własnych emocji)</small></h6>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                style="width: {{ analysis.data.emotional_intelligence_details.self_awareness if analysis.data.emotional_intelligence_details else 70 }}%;"
+                                aria-valuenow="{{ analysis.data.emotional_intelligence_details.self_awareness if analysis.data.emotional_intelligence_details else 70 }}"
+                                aria-valuemin="0" aria-valuemax="100">
+                                {{ analysis.data.emotional_intelligence_details.self_awareness if analysis.data.emotional_intelligence_details else 70 }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-aspect mb-3">
+                        <h6 class="text-info">Regulacja emocjonalna <small class="text-muted">(zarządzanie emocjami)</small></h6>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                style="width: {{ analysis.data.emotional_intelligence_details.emotional_regulation if analysis.data.emotional_intelligence_details else 70 }}%;"
+                                aria-valuenow="{{ analysis.data.emotional_intelligence_details.emotional_regulation if analysis.data.emotional_intelligence_details else 70 }}"
+                                aria-valuemin="0" aria-valuemax="100">
+                                {{ analysis.data.emotional_intelligence_details.emotional_regulation if analysis.data.emotional_intelligence_details else 70 }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-aspect mb-3">
+                        <h6 class="text-info">Świadomość społeczna <small class="text-muted">(empatia i zrozumienie innych)</small></h6>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                style="width: {{ analysis.data.emotional_intelligence_details.social_awareness if analysis.data.emotional_intelligence_details else 70 }}%;"
+                                aria-valuenow="{{ analysis.data.emotional_intelligence_details.social_awareness if analysis.data.emotional_intelligence_details else 70 }}"
+                                aria-valuemin="0" aria-valuemax="100">
+                                {{ analysis.data.emotional_intelligence_details.social_awareness if analysis.data.emotional_intelligence_details else 70 }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-aspect mb-3">
+                        <h6 class="text-info">Zarządzanie relacjami <small class="text-muted">(interakcje społeczne)</small></h6>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                style="width: {{ analysis.data.emotional_intelligence_details.relationship_management if analysis.data.emotional_intelligence_details else 70 }}%;"
+                                aria-valuenow="{{ analysis.data.emotional_intelligence_details.relationship_management if analysis.data.emotional_intelligence_details else 70 }}"
+                                aria-valuemin="0" aria-valuemax="100">
+                                {{ analysis.data.emotional_intelligence_details.relationship_management if analysis.data.emotional_intelligence_details else 70 }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="score-interpretation mt-4">
+    <div class="detailed-analysis">
+        <h4 class="mb-3">Szczegółowa Analiza Psychologiczna</h4>
+
+        <!-- Wzorce Emocjonalne -->
+        <div class="analysis-section mb-4">
+            <h5>Wzorce Emocjonalne</h5>
+            <div class="patterns-chart"></div>
+            <p class="pattern-description"></p>
+        </div>
+
+        <!-- Obszary Rozwoju -->
+        <div class="analysis-section mb-4">
+            <h5>Obszary Rozwoju</h5>
+            <div class="progress-indicators"></div>
+        </div>
+
+        <!-- Rekomendacje -->
+        <div class="analysis-section mb-4">
+            <h5>Spersonalizowane Rekomendacje</h5>
+            <ul class="recommendations-list"></ul>
+        </div>
+
+        <!-- Trendy Długoterminowe -->
+        <div class="analysis-section mb-4">
+            <h5>Trendy Długoterminowe</h5>
+            <div class="trends-visualization"></div>
+        </div>
+    </div>
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Ten wskaźnik odzwierciedla Twój obecny poziom rozwoju emocjonalnego,
+                        oparty na analizie Twoich odpowiedzi i wzorców komunikacji.
+                    </p>
+                    {% if analysis.emotional_intelligence_score < 40 %}
+                    <p class="text-info small">
+                        Jesteś na początku swojej podróży rozwoju emocjonalnego. 
+                        Każda refleksja to krok do przodu!
+                    </p>
+                    {% elif analysis.emotional_intelligence_score < 70 %}
+                    <p class="text-info small">
+                        Wykazujesz rosnącą świadomość emocjonalną. 
+                        Kontynuuj pracę nad pogłębianiem zrozumienia siebie.
+                    </p>
+                    {% else %}
+                    <p class="text-info small">
+                        Pokazujesz wysoki poziom inteligencji emocjonalnej. 
+                        Skupiaj się na dalszym doskonaleniu i dzieleniu się swoim doświadczeniem.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Personality Traits -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 analysis-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-fingerprint text-info me-2"></i>Zauważone cechy osobowości
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.data.personality_traits %}
+                            <ul class="list-group list-group-flush bg-dark">
+                                {% for trait in analysis.data.personality_traits %}
+                                    <li class="list-group-item bg-dark d-flex justify-content-between align-items-center">
+                                        {{ trait }}
+                                        {% if analysis.data.trait_scores and trait in analysis.data.trait_scores %}
+                                            <span class="badge bg-info rounded-pill">{{ analysis.data.trait_scores[trait] }}%</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">Za mało danych, aby określić cechy osobowości.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emotional Patterns -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 analysis-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-heart text-info me-2"></i>Wzorce emocjonalne
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.data.emotional_patterns %}
+                            <ul class="list-group list-group-flush bg-dark">
+                                {% for pattern in analysis.data.emotional_patterns %}
+                                    <li class="list-group-item bg-dark">{{ pattern }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">Za mało danych, aby określić wzorce emocjonalne.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cognitive Patterns -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 analysis-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-sitemap text-info me-2"></i>Wzorce poznawcze
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.data.cognitive_patterns %}
+                            <ul class="list-group list-group-flush bg-dark">
+                                {% for pattern in analysis.data.cognitive_patterns %}
+                                    <li class="list-group-item bg-dark">{{ pattern }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">Za mało danych, aby określić wzorce poznawcze.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Growth Areas -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 analysis-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-seedling text-info me-2"></i>Obszary rozwoju
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.data.growth_areas %}
+                            <ul class="list-group list-group-flush bg-dark">
+                                {% for area in analysis.data.growth_areas %}
+                                    <li class="list-group-item bg-dark">{{ area }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">Za mało danych, aby określić obszary rozwoju.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="card mb-4 analysis-insights">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb text-info me-2"></i>Kluczowe spostrzeżenia
+                </h5>
+                <div class="insight-stats">
+                    <span class="badge bg-success me-2" title="Poziom spójności analizy">
+                        Spójność: {{ "%.1f"|format(analysis.data.insight_quality.coherence_level) }}/5
+                    </span>
+                    <span class="badge bg-primary" title="Potencjał rozwojowy">
+                        Potencjał: {{ "%.1f"|format(analysis.data.insight_quality.development_potential) }}%
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Progress Visualization -->
+                <div class="progress mb-4" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {{ analysis.data.insight_quality.development_potential }}%">
+                        Postęp rozwojowy
+                    </div>
+                </div>
+
+                <!-- Growth Challenges -->
+                <div class="challenges-section mb-4">
+                    <h6 class="text-info mb-3">Wyzwania rozwojowe</h6>
+                    <div class="row">
+                        {% for area in analysis.data.growth_areas[:3] %}
+                        <div class="col-md-4 mb-3">
+                            <div class="challenge-card p-3 border-left">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Wyzwanie {{ loop.index }}</h6>
+                                    <span class="badge bg-info">7 dni</span>
+                                </div>
+                                <p class="mb-2">{{ area }}</p>
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if analysis.data.insights %}
+                    <div class="insights-list">
+                        {% for insight in analysis.data.insights %}
+                            {% if insight|trim %}
+                                <div class="insight-item p-3 mb-3 border-left">
+                                    <i class="fas fa-quote-left text-info me-2"></i>
+                                    <span class="insight-text">{{ insight }}</span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-hourglass-half text-muted fa-2x mb-3"></i>
+                        <p class="text-muted mb-0">Za mało danych, aby sformułować spostrzeżenia.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Wykresy Emocjonalne -->
+        {% if emotion_chart %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line text-info me-2"></i>Twój rozwój emocjonalny
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 text-center mb-4">
+                        <img src="data:image/png;base64,{{ emotion_chart }}" class="img-fluid rounded" alt="Wykres rozwoju emocjonalnego">
+                        <p class="text-muted mt-2">
+                            <small>Ten wykres pokazuje zmiany w Twoich wzorcach emocjonalnych w czasie.</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Wykres Inteligencji Emocjonalnej -->
+        {% if ei_progress_chart %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-brain text-info me-2"></i>Postęp Twojej inteligencji emocjonalnej
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 text-center mb-4">
+                        <img src="data:image/png;base64,{{ ei_progress_chart }}" class="img-fluid rounded" alt="Wykres postępu inteligencji emocjonalnej">
+                        <p class="text-muted mt-2">
+                            <small>Ten wykres pokazuje zmiany Twojego wyniku inteligencji emocjonalnej w czasie.</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Analiza słów kluczowych -->
+        {% if keywords_analysis and keywords_analysis.wordcloud_image %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cloud text-info me-2"></i>Najczęściej używane przez Ciebie słowa
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 text-center mb-4">
+                        <img src="data:image/png;base64,{{ keywords_analysis.wordcloud_image }}" class="img-fluid rounded" alt="Chmura słów kluczowych">
+                        <p class="text-muted mt-2">
+                            <small>Ta chmura tagów pokazuje słowa, których najczęściej używasz w swoich odpowiedziach. Większe słowa pojawiały się częściej.</small>
+                        </p>
+                    </div>
+                </div>
+
+                {% if keywords_analysis.top_keywords %}
+                <div class="mt-3">
+                    <h6 class="mb-3">Twoje najczęściej używane słowa:</h6>
+                    <div class="keyword-tags">
+                        {% for word, count in keywords_analysis.top_keywords.items() %}
+                            {% if loop.index <= 15 %}
+                            <span class="badge bg-dark me-2 mb-2 p-2" style="font-size: {{ 0.8 + (count * 0.1) }}rem;">{{ word }} <small>({{ count }})</small></span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="mt-4">
+                    <p>
+                        Wiedza o słowach, których najczęściej używasz, może pomóc Ci lepiej zrozumieć Twoje wzorce myślowe i tematy, które dominują w Twoim życiu. 
+                        Zastanów się, czy widoczne trendy pokazują kierunek Twoich myśli, wartości i priorytetów.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% elif keywords_analysis and keywords_analysis.message %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cloud text-info me-2"></i>Analiza słów kluczowych
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted">{{ keywords_analysis.message }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Analysis Timestamp -->
+        <div class="text-center text-muted mb-4">
+            <small>Analiza wygenerowana: {{ analysis.timestamp.strftime('%d.%m.%Y, %H:%M') }}</small>
+        </div>
+
+        <!-- Actions -->
+        <div class="text-center mt-4 mb-4">
+            <a href="{{ url_for('analysis', regenerate=True) }}" class="btn btn-outline-info btn-therapy me-2">
+                <i class="fas fa-sync-alt me-2"></i>Wygeneruj nową analizę
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-therapy">
+                <i class="fas fa-arrow-left me-2"></i>Wróć do pytań
+            </a>
+        </div>
+
+    {% else %}
+        <div class="card bg-dark">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-hourglass-half text-muted fa-4x mb-3"></i>
+                <h4>Niewystarczająca liczba odpowiedzi</h4>
+                <p class="mb-4">
+                    Potrzebujemy więcej Twoich odpowiedzi, aby przeprowadzić analizę psychologiczną.
+                    Odpowiedz na więcej pytań, aby uzyskać wnikliwe spostrzeżenia.
+                </p>
+                <a href="{{ url_for('index') }}" class="btn btn-info btn-therapy">
+                    <i class="fas fa-arrow-left me-2"></i>Wróć do pytania
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.border-left {
+    border-left: 3px solid var(--bs-info);
+    background-color: rgba(13, 202, 240, 0.05);
+}
+.analysis-card .card-header {
+    background-color: rgba(13, 202, 240, 0.05);
+}
+.analysis-insights .card-header {
+    background-color: rgba(13, 202, 240, 0.05);
+}
+</style>
+{% endblock %}

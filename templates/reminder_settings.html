@@ -1,0 +1,163 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="therapy-container">
+    <h2 class="mb-4">
+        <i class="fas fa-bell text-info me-2"></i>Ustawienia przypomnień
+    </h2>
+    
+    <div class="card bg-dark mb-4">
+        <div class="card-body">
+            <p class="lead">
+                Otrzymuj przypomnienia o codziennej refleksji terapeutycznej. 
+                Regularne odpowiadanie na pytania pomoże Ci w lepszym zrozumieniu siebie 
+                i rozwoju emocjonalnym.
+            </p>
+            
+            {% if success_message %}
+            <div class="alert alert-success">
+                {{ success_message }}
+            </div>
+            {% endif %}
+            
+            {% if error_message %}
+            <div class="alert alert-danger">
+                {{ error_message }}
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="{{ url_for('reminder_settings') }}" class="mt-4">
+                <!-- Włączenie/wyłączenie przypomnień -->
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" id="reminder_enabled" name="reminder_enabled" 
+                        {% if user.reminder_enabled %}checked{% endif %}>
+                    <label class="form-check-label" for="reminder_enabled">
+                        Włącz przypomnienia
+                    </label>
+                </div>
+                
+                <!-- Metoda przypomnienia -->
+                <div class="mb-4">
+                    <label class="form-label">Metoda przypomnienia</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reminder_method" id="method_email"
+                            value="email" {% if user.reminder_method == 'email' %}checked{% endif %}>
+                        <label class="form-check-label" for="method_email">
+                            E-mail ({{ user.email }})
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reminder_method" id="method_sms"
+                            value="sms" {% if user.reminder_method == 'sms' %}checked{% endif %}
+                            {% if not has_twilio or not user.phone_number %}disabled{% endif %}>
+                        <label class="form-check-label" for="method_sms">
+                            SMS {% if user.phone_number %}({{ user.phone_number }}){% else %}(brak numeru telefonu){% endif %}
+                            {% if not has_twilio %}<span class="text-warning">(niedostępne)</span>{% endif %}
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Numer telefonu dla SMS -->
+                <div class="mb-4">
+                    <label for="phone_number" class="form-label">Numer telefonu</label>
+                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                        placeholder="+48123456789" value="{{ user.phone_number or '' }}">
+                    <div class="form-text text-muted">Format: +48XXXXXXXXX (z kierunkowym kraju)</div>
+                </div>
+                
+                <!-- Czas przypomnienia -->
+                <div class="mb-4">
+                    <label for="reminder_time" class="form-label">Godzina przypomnienia</label>
+                    <input type="time" class="form-control" id="reminder_time" name="reminder_time" 
+                        value="{{ user.reminder_time.strftime('%H:%M') if user.reminder_time else '20:00' }}">
+                </div>
+                
+                <!-- Strefa czasowa -->
+                <div class="mb-4">
+                    <label for="reminder_timezone" class="form-label">Strefa czasowa</label>
+                    <select class="form-select" id="reminder_timezone" name="reminder_timezone">
+                        {% for zone in timezones %}
+                            <option value="{{ zone }}" {% if zone == user.reminder_timezone %}selected{% endif %}>
+                                {{ zone }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Przyciski akcji -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-save me-2"></i>Zapisz ustawienia
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Powrót
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if reminder_logs %}
+    <div class="card bg-dark mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-history text-info me-2"></i>Historia przypomnień
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Metoda</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in reminder_logs %}
+                        <tr>
+                            <td>{{ log.timestamp.strftime('%d.%m.%Y, %H:%M') }}</td>
+                            <td>
+                                {% if log.method == 'email' %}
+                                <i class="fas fa-envelope me-2"></i>E-mail
+                                {% elif log.method == 'sms' %}
+                                <i class="fas fa-sms me-2"></i>SMS
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.status == 'success' %}
+                                <span class="text-success"><i class="fas fa-check me-2"></i>Wysłano</span>
+                                {% else %}
+                                <span class="text-danger" title="{{ log.error_message }}">
+                                    <i class="fas fa-times me-2"></i>Błąd
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Testowe wysłanie powiadomienia -->
+    <div class="card bg-dark mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-vial text-info me-2"></i>Test powiadomienia
+            </h5>
+        </div>
+        <div class="card-body">
+            <p>Sprawdź, czy powiadomienia działają poprawnie.</p>
+            <form method="POST" action="{{ url_for('test_reminder') }}">
+                <button type="submit" class="btn btn-outline-info">
+                    <i class="fas fa-paper-plane me-2"></i>Wyślij testowe powiadomienie
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

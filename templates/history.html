@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="therapy-container">
+    <h2 class="mb-4">
+        <i class="fas fa-history text-info me-2"></i>Historia Twoich refleksji
+    </h2>
+    
+    {% if conversations %}
+        <p class="lead mb-4">
+            Przeglądaj swoje wcześniejsze odpowiedzi, aby śledzić swoją ścieżkę rozwoju.
+        </p>
+        
+        <div class="card bg-dark mb-4">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lightbulb text-warning me-3 fa-2x"></i>
+                    <div>
+                        <h5 class="mb-1">Wskazówka</h5>
+                        <p class="mb-0">Regularne przeglądanie swoich refleksji pomaga dostrzec wzorce i zmiany zachodzące w Twoim myśleniu.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% for conversation in conversations %}
+            <div class="card history-card shadow-sm">
+                <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                    <span class="date-text">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        {{ conversation.timestamp.strftime('%d.%m.%Y') }}
+                    </span>
+                    <span class="badge bg-info rounded-pill">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ conversation.timestamp.strftime('%H:%M') }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-question-circle text-info me-2"></i>Pytanie:
+                    </h5>
+                    <p class="question-text mb-4">{{ conversation.question }}</p>
+                    
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <i class="fas fa-comment me-2"></i>Twoja odpowiedź:
+                    </h6>
+                    <p class="response-text">{{ conversation.response }}</p>
+                </div>
+            </div>
+            {% if not loop.last %}
+                <div class="timeline-connector d-flex justify-content-center my-3">
+                    <div class="vr" style="height: 30px;"></div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        
+        {% if conversations|length >= 5 %}
+            <div class="text-center mt-4">
+                <a href="#" class="btn btn-outline-info btn-therapy" id="load-more">
+                    <i class="fas fa-chevron-down me-2"></i>Załaduj więcej
+                </a>
+            </div>
+        {% endif %}
+        
+    {% else %}
+        <div class="card bg-dark">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-inbox text-muted fa-4x mb-3"></i>
+                <h4>Brak historii refleksji</h4>
+                <p class="mb-4">Odpowiedz na swoje pierwsze pytanie, aby rozpocząć podróż.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-info btn-therapy">
+                    <i class="fas fa-arrow-left me-2"></i>Wróć do pytania
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

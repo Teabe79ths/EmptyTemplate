@@ -1,0 +1,152 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="therapy-container py-3">
+    {% if session.get('user_id') %}
+        {% if conversation %}
+            <!-- Therapeutic Quote -->
+            <div class="card bg-dark mb-4">
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0 text-center">
+                        <p class="font-italic text-info">{{ quote if quote else "Każdy dzień to nowa szansa na rozwój." }}</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <!-- Daily Question Card -->
+            <div class="card question-card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4 text-info">
+                        <i class="fas fa-lightbulb me-2"></i>Twoje dzisiejsze pytanie
+                    </h5>
+                    <p class="question-text mb-4">{{ conversation.question }}</p>
+
+                    {% if conversation.response %}
+                        <div class="card bg-dark mb-3">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    <i class="fas fa-comment me-2"></i>Twoja odpowiedź
+                                </h6>
+                                <p class="response-text">{{ conversation.response }}</p>
+                                <small class="date-text text-muted">
+                                    Zapisano: {{ conversation.timestamp.strftime('%d.%m.%Y, %H:%M') }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <p class="mb-3">Dziękuję za Twoją dzisiejszą refleksję!</p>
+                            <p class="small text-muted">Wróć jutro po nowe pytanie refleksyjne.</p>
+                        </div>
+                    {% else %}
+                        <!-- Response Form -->
+                        <form action="{{ url_for('submit_response') }}" method="post" class="response-form">
+                            <input type="hidden" name="conversation_id" value="{{ conversation.id }}">
+                            <div class="mb-3">
+                                <label for="response-textarea" class="form-label">Twoja odpowiedź:</label>
+                                <textarea 
+                                    class="form-control auto-resize" 
+                                    id="response-textarea" 
+                                    name="response" 
+                                    rows="4" 
+                                    placeholder="Weź głęboki oddech i zastanów się nad odpowiedzią..."
+                                    maxlength="1000"
+                                    required
+                                ></textarea>
+                                <div class="text-end mt-1">
+                                    <small class="text-muted">
+                                        Pozostało znaków: <span id="char-counter">1000</span>
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" id="submit-response" class="btn btn-info btn-therapy">
+                                    <i class="fas fa-paper-plane me-2"></i>Zapisz moją odpowiedź
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="card bg-dark mt-5">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3 text-info">
+                        <i class="fas fa-info-circle me-2"></i>Wskazówki do refleksji
+                    </h5>
+                    <ul class="list-group list-group-flush bg-dark">
+                        <li class="list-group-item bg-dark">Poświęć chwilę na wyciszenie się przed odpowiedzią.</li>
+                        <li class="list-group-item bg-dark">Nie oceniaj swoich myśli - tu nie ma dobrych czy złych odpowiedzi.</li>
+                        <li class="list-group-item bg-dark">Bądź dla siebie wyrozumiały/a i szczery/a.</li>
+                        <li class="list-group-item bg-dark">Zapisuj odpowiedzi dla siebie, nie dla innych.</li>
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Wystąpił problem z wygenerowaniem pytania. Proszę odśwież stronę.
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Welcome Section for Non-logged Users -->
+        <div class="text-center welcome-message">
+            <h1 class="display-5 mb-4">Witaj w Wirtualnym Terapeucie</h1>
+            <p class="lead mb-4">
+                Codzienne pytania refleksyjne, które pomogą Ci lepiej zrozumieć siebie i swoje emocje.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="{{ url_for('register') }}" class="btn btn-info btn-lg px-4 me-md-2 btn-therapy">
+                    <i class="fas fa-user-plus me-2"></i>Rozpocznij swoją podróż
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4 btn-therapy">
+                    <i class="fas fa-sign-in-alt me-2"></i>Zaloguj się
+                </a>
+            </div>
+        </div>
+
+        <div class="row mt-5 g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card h-100 bg-dark">
+                    <div class="card-body text-center">
+                        <i class="fas fa-brain text-info fa-3x mb-3"></i>
+                        <h5 class="card-title">Codzienne pytania</h5>
+                        <p class="card-text">Każdego dnia otrzymasz nowe pytanie, które pomoże Ci w głębszej refleksji nad sobą i swoim życiem.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card h-100 bg-dark">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line text-info fa-3x mb-3"></i>
+                        <h5 class="card-title">Spersonalizowane doświadczenie</h5>
+                        <p class="card-text">Pytania są dobierane na podstawie Twoich wcześniejszych odpowiedzi, tworząc spójną ścieżkę rozwoju.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card h-100 bg-dark">
+                    <div class="card-body text-center">
+                        <i class="fas fa-lock text-info fa-3x mb-3"></i>
+                        <h5 class="card-title">Prywatność i bezpieczeństwo</h5>
+                        <p class="card-text">Twoje odpowiedzi są całkowicie prywatne i bezpieczne, dostępne tylko dla Ciebie.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-container mt-5">
+            <blockquote class="blockquote">
+                <p>"Samoświadomość jest pierwszym krokiem do transformacji."</p>
+            </blockquote>
+            <figcaption class="blockquote-footer">
+                Irvin D. Yalom
+            </figcaption>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
