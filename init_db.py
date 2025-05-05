@@ -1,11 +1,10 @@
 
-from app import app, db
+from app import app
+from database import db
 
 def init_db():
     with app.app_context():
-        # Import all models here
         from models import User, Conversation, PsychologicalAnalysis, ReminderLog
-        
         print("Creating database tables...")
         db.create_all()
         print("Database tables created successfully!")

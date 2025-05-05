@@ -2,24 +2,19 @@ import os
 import logging
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
+from database import db
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-class Base(DeclarativeBase):
-    pass
-
-db = SQLAlchemy(model_class=Base)
 # create the app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
 if not app.secret_key:
     raise ValueError("SESSION_SECRET environment variable is not set")
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Configure PostgreSQL database
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neondb_owner:npg_v7wLqX2AFzHa@ep-mute-cake-a2rfn0ki-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
@@ -32,14 +27,14 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # initialize the app with the extension
 db.init_app(app)
 
+# Import models after db initialization
+from models import User, Conversation, PsychologicalAnalysis, ReminderLog
+
 with app.app_context():
-    # Import models and create tables
-    from models import User, Conversation, PsychologicalAnalysis, ReminderLog
     try:
         db.create_all()
     except Exception as e:
         app.logger.error(f"Błąd podczas tworzenia tabel: {str(e)}")
-        # Tabele prawdopodobnie już istnieją, więc możemy kontynuować
         pass
 
 # Import therapy functionality
@@ -48,21 +43,8 @@ from claude_api import generate_claude_question
 from psychology import generate_psychological_insight, get_emotional_intelligence_score
 from visualization import generate_emotion_chart, generate_emotional_intelligence_progress
 from wordcloud_analyzer import analyze_user_responses_keywords
+from quotes import generate_therapeutic_quote
 
-# Placeholder for quote generation - replace with actual API integration
-def generate_therapeutic_quote():
-    quotes = [
-        "The mind is everything. What you think you become.",
-        "What lies behind you and what lies in front of you, pales in comparison to what lies inside of you.",
-        "Challenges are what make life interesting. Overcoming them is what makes life meaningful.",
-        "Believe you can and you're halfway there.",
-        "The best and most beautiful things in the world cannot be seen or even touched - they must be felt with the heart."
-    ]
-    import random
-    return random.choice(quotes)
-
-
-# Context processor to add date to all templates
 @app.context_processor
 def inject_now():
     return {'now': datetime.now()}
@@ -226,7 +208,7 @@ def analysis():
         return redirect(url_for('index'))
 
     user_id = session['user_id']
-    from models import User, PsychologicalAnalysis
+    from models import User, PsychologicalAnalysis, Conversation
     user = User.query.get(user_id)
 
     # Sprawdź, czy chcemy wygenerować nową analizę

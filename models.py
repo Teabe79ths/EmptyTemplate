@@ -1,8 +1,9 @@
-from app import db
+
 from datetime import datetime, time
 from flask_login import UserMixin
 import json
 import pytz
+from database import db
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -28,24 +29,19 @@ class User(UserMixin, db.Model):
         return f'<User {self.username}>'
     
     def is_reminder_due(self):
-        """Sprawdza, czy należy wysłać przypomnienie użytkownikowi."""
         if not self.reminder_enabled:
             return False
             
-        # Jeśli nie ma żadnych powiadomień w historii
         if not self.last_reminder_sent:
             return True
             
-        # Pobierz aktualny czas w strefie czasowej użytkownika
         timezone = pytz.timezone(self.reminder_timezone)
         now = datetime.now(timezone)
         last_reminder = self.last_reminder_sent.astimezone(timezone)
         
-        # Sprawdź, czy dziś już wysłano przypomnienie
         if (now.date() == last_reminder.date()):
             return False
             
-        # Sprawdź, czy aktualna godzina jest późniejsza niż ustawiona godzina przypomnienia
         reminder_datetime = datetime.combine(now.date(), self.reminder_time)
         reminder_datetime = timezone.localize(reminder_datetime)
         
@@ -65,29 +61,25 @@ class PsychologicalAnalysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.now)
-    analysis_data = db.Column(db.Text, nullable=False)  # JSON z analizą psychologiczną
+    analysis_data = db.Column(db.Text, nullable=False)
     emotional_intelligence_score = db.Column(db.Integer, default=0)
     
     def get_analysis(self):
-        """Konwertuje dane JSON na słownik Pythona"""
         return json.loads(self.analysis_data)
     
     def set_analysis(self, analysis_dict):
-        """Konwertuje słownik Pythona na JSON do przechowywania"""
         self.analysis_data = json.dumps(analysis_dict)
     
     def __repr__(self):
         return f'<PsychologicalAnalysis {self.id} User {self.user_id}>'
 
-
 class ReminderLog(db.Model):
-    """Log wszystkich wysłanych przypomnień."""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.now)
-    method = db.Column(db.String(10), nullable=False)  # 'email' lub 'sms'
-    status = db.Column(db.String(20), nullable=False)  # 'success', 'failed'
-    error_message = db.Column(db.Text, nullable=True)  # w przypadku błędu
+    method = db.Column(db.String(10), nullable=False)
+    status = db.Column(db.String(20), nullable=False)
+    error_message = db.Column(db.Text, nullable=True)
     
     def __repr__(self):
         return f'<ReminderLog {self.id} User {self.user_id} Method {self.method} Status {self.status}>'
